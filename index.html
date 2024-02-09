@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <Style>
+        /* Apply styles to heading1 */
+        h1 {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 22px;
+            text-align: center;
+            font-variant: Normal;
+            text-transform: uppercase;
+            
+        }
+        /* Apply styles to links */
+        a{
+            color: #3498db;
+        }
+        /* Apply styles to heading2 */
+        h2 {
+            font-family:Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            text-align: center;
+            text-transform: capitalize;
+            
+        }
+
+        /* Apply styles to table */
+        table {
+        border-collapse: collapse; 
+        width: 80%; 
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+        /* Apply styles to table cells */
+        td {
+        border: 1px solid #dddddd; /* Gray border */
+        padding: 8px; /* Add padding */
+        text-align: left; /* Align text to the left */
+    }
+        tr:nth-child(1){
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #686868; 
+            border: 2px solid #dddddd;
+            color: rgb(255, 255, 255);
+    }
+        /* Apply alternate row colors */
+        tr:nth-child(even) {
+        background-color: #f9f9f9; /* Lighter gray background for even rows */
+    }
+        /* Apply hover effect on rows */
+        tr:hover {
+        background-color: #e2e2e2; /* Darker gray background on hover */
+    }
+
+    </Style>
+
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IDV_A1_1007640</title>
+
+  </head>
+  <body>
+    <h1><a href="https://beta.data.gov.sg/">Pollutant Standard Index, Singapore </a></h1>
+    <h2 id = 'timestamp'></h2>
+    
+    <div id= 'psiTable';  align = 'center'></div>
+
+    </body>
+
+
+ 
+    <script>
+        fetch('https://api.data.gov.sg/v1/environment/psi')
+        .then(response => response.json())
+        .then(data => {
+        const readings = data.items[0].readings; // Obtain reading array from the json data
+        const keys = Object.keys(readings).sort(); // Retrieve Metrics names 
+        const headers = Object.keys(readings[keys[0]]); // Obtain the region names for header
+
+        // Get the timestamp of API Last request
+        const updateTimestamp = data.items[0].update_timestamp;
+        const timestampDate = new Date(updateTimestamp); // Convert the timestamp string to a Date object
+
+        // Extract the date and time parts from the Date object
+        const datePart = timestampDate.toLocaleDateString();
+        const timePart = timestampDate.toLocaleTimeString();
+
+        // Create a header 2 element
+        const header2 = document.createElement('h2');
+
+        // Set the text content of the header 2 element to the date and time
+        header2.textContent = `Last Updated: ${datePart} ${timePart}`;
+
+        // Append table to the document body
+        document.getElementById('timestamp').appendChild(header2);
+
+        // Create table element
+        const table = document.createElement('table');
+        const headerRow = table.insertRow();
+
+        // Insert headers
+        headerRow.insertCell().textContent = 'Metrics';
+        headers.forEach(header => {
+            headerRow.insertCell().textContent = header;
+        });
+
+        // Create document fragment to hold rows
+        const fragment = document.createDocumentFragment();
+
+        // Insert rows
+        keys.forEach(key => {
+            const row = table.insertRow();
+            row.insertCell().textContent = key;
+            headers.forEach(header => {
+                row.insertCell().textContent = readings[key][header];
+            });
+        });
+
+        // Append fragment to table
+        table.appendChild(fragment);
+
+        // Append table to the document body
+        document.getElementById('psiTable').appendChild(table);
+    });
+
+
+
+    </script>
+</html>
